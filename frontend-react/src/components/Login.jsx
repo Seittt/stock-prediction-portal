@@ -3,7 +3,7 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "./AuthProvider";
+import { AuthContext } from "../AuthProvider";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -31,7 +31,7 @@ const Login = () => {
       console.log("response.data ==>", response.data);
       console.log("login successful");
       setIsLoggedIn(true);
-      navigate("/");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Invalid credentials");
       setError("Invalid credentials");

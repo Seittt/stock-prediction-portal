@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import Button from "./Button.jsx";
 import { Link } from "react-router-dom";
-import { AuthContext } from "./AuthProvider.jsx";
+import { AuthContext } from "../AuthProvider.jsx";
 import { useNavigate } from "react-router-dom";
 
 const Header = () => {
@@ -10,7 +10,7 @@ const Header = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("RefreshToken");
+    localStorage.removeItem("refreshToken");
     setIsLoggedIn(false);
     console.log("Logged out");
     navigate("/login");
@@ -24,13 +24,16 @@ const Header = () => {
 
         <div>
           {isLoggedIn ? (
-            <button
-              text="logout"
-              className="btn btn-danger"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
+            <>
+              <Button text="Dashboard" class="btn-info me-2" url="/dashboard" />
+              <button
+                text="logout"
+                className="btn btn-outline-danger"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </>
           ) : (
             <>
               <Button text="Login" class="btn-outline-info" url="/login" />
