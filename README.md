@@ -42,6 +42,7 @@ This project combines web development and machine learning, demonstrating how ML
 - backend-drf/ (Django REST API)
 - backend-drf/requirements.txt (Python dependencies)
 - frontend-react/ (React application)
+- Resources/ (Jupyter notebooks and datasets for ML practice)
 - README.md (Project documentation)
 
 ---
