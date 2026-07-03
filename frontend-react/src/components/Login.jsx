@@ -1,9 +1,10 @@
-import { React, useState, useContext } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthProvider";
+import axiosInstance from "../axiosInstance";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -22,9 +23,9 @@ const Login = () => {
     console.log(userData);
 
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/v1/token/",
-        userData
+      const response = await axiosInstance.post(
+        "http://localhost:8000/api/v1/token/",
+        userData,
       );
       localStorage.setItem("accessToken", response.data.access);
       localStorage.setItem("refreshToken", response.data.refresh);

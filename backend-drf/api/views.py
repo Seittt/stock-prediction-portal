@@ -24,12 +24,14 @@ class StockPredictionAPIView(APIView):
 
             # Fetch the data from yfinance
             now = datetime.now()
-            start = datetime(now.year-10, now.month, now.day)
+            start = now - pd.DateOffset(years=10)
             end = now
             df= yf.download(ticker, start, end)
             if df.empty:
                 return Response({"status" : status.HTTP_404_NOT_FOUND, "error" : "No data found for the given ticker"})
             df = df.reset_index()
+            if not os.path.exists(settings.MEDIA_ROOT):
+                os.makedirs(settings.MEDIA_ROOT)
             # Generate Basic Plot
             plt.switch_backend('AGG')
             plt.figure(figsize=(12, 5))
@@ -41,6 +43,7 @@ class StockPredictionAPIView(APIView):
             # Save the plot to a file
             plot_img_path = f"{ticker}_plot.png"
             plot_img = save_plot(plot_img_path)
+            plt.close()
             
             # 100 Days Moving Average
             ma100 = df.Close.rolling(100).mean()
@@ -55,6 +58,7 @@ class StockPredictionAPIView(APIView):
             # Save the plot to a file
             plot_img_path = f"{ticker}_100_dma.png"
             plot_100_dma = save_plot(plot_img_path)
+            plt.close()
 
             # 200 Days Moving Average
             ma200 = df.Close.rolling(200).mean()
@@ -70,6 +74,7 @@ class StockPredictionAPIView(APIView):
             # Save the plot to a file
             plot_img_path = f"{ticker}_200_dma.png"
             plot_200_dma = save_plot(plot_img_path)
+            plt.close()
 
             # Splitting data into Training and Testing datasets
             data_training = pd.DataFrame(df.Close[0:int(len(df)*0.7)])
@@ -79,7 +84,8 @@ class StockPredictionAPIView(APIView):
             scaler = MinMaxScaler(feature_range=(0,1))
 
             # Load ML Model
-            model = load_model("stock_prediction_model.keras")
+            model_path = os.path.join(settings.BASE_DIR, 'stock_prediction_model.keras')
+            model = load_model(model_path)
 
             # Preparing testing data
             past_100_days = data_training.tail(100)
@@ -116,6 +122,7 @@ class StockPredictionAPIView(APIView):
             # Save the plot to a file
             plot_img_path = f"{ticker}_final_prediction.png"
             plot_prediction = save_plot(plot_img_path)
+            plt.close()
 
             # Model Evaluation
             # Mean Squared Error (MSE)

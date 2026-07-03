@@ -9,7 +9,7 @@ const axiosInstance = axios.create({
   },
 });
 
-// Request Interceptor
+// Request Interceptor (Staples the access token to requests)
 axiosInstance.interceptors.request.use(
   function (config) {
     const accessToken = localStorage.getItem("accessToken");
@@ -20,36 +20,56 @@ axiosInstance.interceptors.request.use(
   },
   function (error) {
     return Promise.reject(error);
-  }
+  },
 );
 
-// Response Interceptors
+// Response Interceptor (Catches 401s and refreshes)
 axiosInstance.interceptors.response.use(
   function (response) {
     return response;
   },
-  // Handle failed responses
   async function (error) {
     const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest.retry) {
+
+    // If the server says 401 Unauthorized, and we haven't retried yet...
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest.retry
+    ) {
       originalRequest.retry = true;
       const refreshToken = localStorage.getItem("refreshToken");
-      try {
-        const response = await axiosInstance.post("/token/refresh/", {
-          refresh: refreshToken,
-        });
-        localStorage.setItem("accessToken", response.data.access);
-        originalRequest.headers[
-          "Authorization"
-        ] = `Bearer ${response.data.access}`;
-        return axiosInstance(originalRequest);
-      } catch (error) {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
+
+      if (refreshToken) {
+        try {
+          // FIX 1: Use plain 'axios' here, NOT 'axiosInstance'!
+          // This bypasses the request interceptor so we don't send the dead access token.
+          const response = await axios.post(`${baseURL}/token/refresh/`, {
+            refresh: refreshToken,
+          });
+
+          // Save the new token
+          localStorage.setItem("accessToken", response.data.access);
+
+          // Update the original request with the shiny new token
+          originalRequest.headers["Authorization"] =
+            `Bearer ${response.data.access}`;
+
+          // Try the original request again
+          return axiosInstance(originalRequest);
+        } catch (refreshError) {
+          // FIX 2: If the refresh token is ALSO dead, kick them to the login screen
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          window.location.href = "/login";
+        }
+      } else {
+        // If there's no refresh token in storage, kick them out
+        window.location.href = "/login";
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axiosInstance;

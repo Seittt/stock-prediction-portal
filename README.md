@@ -45,6 +45,81 @@ This project combines web development and machine learning, demonstrating how ML
 - Resources/ (Jupyter notebooks and datasets for ML practice)
 - README.md (Project documentation)
 
+## 🏁 Getting Started
+
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (recommended, easiest setup)
+- OR manually: **Python 3.12 or lower** (TensorFlow 2.20.0 has no Windows wheels for Python 3.13+ yet), Node.js 18+, npm
+
+### Environment Variables
+
+This project uses `.env` files for configuration, which are **not committed to git**. Create these yourself after cloning:
+
+**`backend-drf/.env`**
+
+```env
+SECRET_KEY=your-django-secret-key
+DEBUG=True
+```
+
+Generate a secret key with:
+
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+**`frontend-react/.env`**
+
+```env
+# add any Vite env vars here (must be prefixed with VITE_)
+```
+
+---
+
+### Option 1: Run with Docker (recommended)
+
+From the project root:
+
+```bash
+docker compose up --build
+```
+
+Add `-d` to run in the background. Stop with:
+
+```bash
+docker compose down
+```
+
+---
+
+### Option 2: Run manually
+
+**Backend (Django + DRF)**
+
+```bash
+cd backend-drf
+python -m venv venv
+venv\Scripts\activate      # Windows
+# source venv/bin/activate  # macOS/Linux
+
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+Runs at `http://127.0.0.1:8000`
+
+**Frontend (React + Vite)**
+
+```bash
+cd frontend-react
+npm install
+npm run dev
+```
+
+Runs at `http://localhost:5173`
+
 ---
 
 ## 🧠 Machine Learning Overview

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosInstance from "../axiosInstance";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -10,6 +11,7 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleRegistration = async (e) => {
     e.preventDefault();
@@ -19,14 +21,18 @@ const Register = () => {
 
     console.log("userData ==>", userData);
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/v1/register/",
-        userData
+      const response = await axiosInstance.post(
+        "http://localhost:8000/api/v1/register/",
+        userData,
       );
-      console.log("response.data ==>", response.data);
       console.log("registration successful");
       setErrors({});
       setSuccess(true);
+
+      // Add this little timer to redirect!
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (error) {
       setErrors(error.response.data);
       setSuccess(false);
